@@ -6,9 +6,20 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdi
 
 
 class GraphIsomorphismChecker(QWidget):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Проверка изоморфизма графов")
+        # Задание заголовка
+        self.setWindowTitle("Изоморфизм")
+
+        # Настройка размеров окна
+        self.setMinimumWidth(315)
+        self.setFixedHeight(175)
+
+        # Настройка шрифтов
+        font = self.font()
+        font.setFamily('Times New Roman')
+        font.setPixelSize(17)
+        self.setFont(font)
 
         layout = QVBoxLayout()
 
@@ -39,7 +50,6 @@ class GraphIsomorphismChecker(QWidget):
             vertex1, vertex2 = link
             dict_links[vertex1].add(vertex2)
             dict_links[vertex2].add(vertex1)
-
         return dict(dict_links)
 
     def is_isomorphic(self, graph1: Dict[str, Set[str]], graph2: Dict[str, Set[str]]) -> bool:
@@ -48,7 +58,6 @@ class GraphIsomorphismChecker(QWidget):
                 return matched[vertex1] == vertex2
 
             matched[vertex1] = vertex2
-
             if len(graph1[vertex1]) != len(graph2[vertex2]):
                 return False
 
@@ -84,12 +93,12 @@ class GraphIsomorphismChecker(QWidget):
                 vertex1 = vertex1.strip()
                 vertex2 = vertex2.strip()
                 links_list.append((vertex1, vertex2))
-        except Exception as e:
+        except Exception:
             raise ValueError("Некорректный формат ввода списка ребер")
 
         return links_list
 
-    def check_isomorphism(self):
+    def check_isomorphism(self) -> None:
         graph1_input = self.entry1.text()
         graph2_input = self.entry2.text()
 
@@ -113,7 +122,7 @@ class GraphIsomorphismChecker(QWidget):
         else:
             self.result_label.setText("Графы не изоморфны")
 
-    def clear_fields(self):
+    def clear_fields(self) -> None:
         self.entry1.clear()
         self.entry2.clear()
         self.result_label.clear()
