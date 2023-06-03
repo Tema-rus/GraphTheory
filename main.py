@@ -1,135 +1,120 @@
 import sys
-from collections import defaultdict
-from typing import Dict, List, Tuple, Set
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 
+from graph import Graph
 
-class GraphIsomorphismChecker(QWidget):
+
+class GraphIsomorphismGUI(QWidget):
+    """
+    Графический интерфейс для проверки изоморфизма двух графов.
+    """
+
     def __init__(self) -> None:
+        """
+        Инициализация класса GraphIsomorphismGUI.
+        """
         super().__init__()
         # Задание заголовка
-        self.setWindowTitle("Изоморфизм")
+        self.setWindowTitle('Изоморфизм')
+        self.init_ui()
+
+    def init_ui(self) -> None:
+        """
+        Инициализация пользовательского интерфейса
+        """
 
         # Настройка размеров окна
-        self.setMinimumWidth(315)
-        self.setFixedHeight(175)
+        self.setFixedHeight(308)
 
-        # Настройка шрифтов
-        font = self.font()
-        font.setFamily('Times New Roman')
-        font.setPixelSize(17)
-        self.setFont(font)
-
+        # Создание вертикального компоновщика
         layout = QVBoxLayout()
 
-        self.entry1 = QLineEdit()
-        self.entry1.setPlaceholderText("Введите список ребер графа 1")
-        layout.addWidget(self.entry1)
+        # Создание меток и полей ввода для списков вершин
+        label_vertices1 = QLabel('Список вершин графа 1 (В формате «Вершина1,Вершина2»):')
+        self.input_vertices1 = QLineEdit()
+        label_vertices2 = QLabel('Список вершин графа 2 (В формате «Вершина1,Вершина2»):')
+        self.input_vertices2 = QLineEdit()
 
-        self.entry2 = QLineEdit()
-        self.entry2.setPlaceholderText("Введите список ребер графа 2")
-        layout.addWidget(self.entry2)
+        # Создание меток и полей ввода для списков ребер
+        label_edges1 = QLabel('Список ребер графа 1 (В формате «Вершина1-Вершина2,Вершина3-Вершина4»):')
+        self.input_edges1 = QLineEdit()
+        label_edges2 = QLabel('Список ребер графа 2 (В формате «Вершина1-Вершина2,Вершина3-Вершина4»):')
+        self.input_edges2 = QLineEdit()
 
-        self.calculate_button = QPushButton("Проверить изоморфизм")
-        self.calculate_button.clicked.connect(self.check_isomorphism)
-        layout.addWidget(self.calculate_button)
+        # Создание кнопок для проверки изоморфизма и очистки
+        self.button_check_isomorphism = QPushButton('Проверить изоморфизм')
+        self.button_check_isomorphism.clicked.connect(self.check_isomorphism)
+        self.button_clear = QPushButton('Очистить')
+        self.button_clear.clicked.connect(self.clear_inputs)
 
-        self.result_label = QLabel()
-        layout.addWidget(self.result_label)
+        # Добавление виджетов на компоновщик
+        layout.addWidget(label_vertices1)
+        layout.addWidget(self.input_vertices1)
+        layout.addWidget(label_edges1)
+        layout.addWidget(self.input_edges1)
+        layout.addWidget(label_vertices2)
+        layout.addWidget(self.input_vertices2)
+        layout.addWidget(label_edges2)
+        layout.addWidget(self.input_edges2)
+        layout.addWidget(self.button_check_isomorphism)
+        layout.addWidget(self.button_clear)
 
-        self.clear_button = QPushButton("Очистить")
-        self.clear_button.clicked.connect(self.clear_fields)
-        layout.addWidget(self.clear_button)
+        # Настройки стилей
+        self.setStyleSheet('background-color: #f2f2f2; font-size: 12px')
+        label_vertices1.setStyleSheet("font-weight: bold;")
+        self.input_vertices1.setStyleSheet("background-color: white; border: 1px solid #ccc; padding: 5px;")
+        label_vertices2.setStyleSheet("font-weight: bold;")
+        self.input_vertices2.setStyleSheet("background-color: white; border: 1px solid #ccc; padding: 5px;")
+        label_edges1.setStyleSheet("font-weight: bold;")
+        self.input_edges1.setStyleSheet("background-color: white; border: 1px solid #ccc; padding: 5px;")
+        label_edges2.setStyleSheet("font-weight: bold;")
+        self.input_edges2.setStyleSheet("background-color: white; border: 1px solid #ccc; padding: 5px;")
+        self.button_check_isomorphism.setStyleSheet(
+            "background-color: #4caf50; color: white; padding: 8px 16px; font-weight: bold;"
+        )
+        self.button_clear.setStyleSheet(
+            "background-color: #f44336; color: white; padding: 8px 16px; font-weight: bold;"
+        )
 
+        # Установка компоновщика для окна
         self.setLayout(layout)
 
-    def get_dict_links(self, list_links: List[Tuple[str, str]]) -> Dict[str, Set[str]]:
-        dict_links = defaultdict(set)
-        for link in list_links:
-            vertex1, vertex2 = link
-            dict_links[vertex1].add(vertex2)
-            dict_links[vertex2].add(vertex1)
-        return dict(dict_links)
-
-    def is_isomorphic(self, graph1: Dict[str, Set[str]], graph2: Dict[str, Set[str]]) -> bool:
-        def is_match(vertex1: str, vertex2: str) -> bool:
-            if vertex1 in matched:
-                return matched[vertex1] == vertex2
-
-            matched[vertex1] = vertex2
-            if len(graph1[vertex1]) != len(graph2[vertex2]):
-                return False
-
-            for neigh1, neigh2 in zip(graph1[vertex1], graph2[vertex2]):
-                if not is_match(neigh1, neigh2):
-                    return False
-
-            return True
-
-        if len(graph1) != len(graph2):
-            return False
-
-        matched = {}
-        for v1 in graph1:
-            for v2 in graph2:
-                if is_match(v1, v2):
-                    return True
-
-        return False
-
-    def parse_links(self, links_str: str) -> List[Tuple[str, str]]:
-        links_list = []
+    def check_isomorphism(self):
         try:
-            links_str = links_str.strip()
-            if links_str.startswith("(") and links_str.endswith(")"):
-                links_str = links_str[1:-1]
-            links = links_str.split("),")
-            for link in links:
-                link = link.strip()
-                if link.startswith("(") and link.endswith(")"):
-                    link = link[1:-1]
-                vertex1, vertex2 = link.split(",")
-                vertex1 = vertex1.strip()
-                vertex2 = vertex2.strip()
-                links_list.append((vertex1, vertex2))
-        except Exception:
-            raise ValueError("Некорректный формат ввода списка ребер")
+            # Получение введенных списков вершин и ребер
+            vertices1 = self.input_vertices1.text().split(',')
+            edges1 = [tuple(edge.split('-')) for edge in self.input_edges1.text().split(',')]
+            vertices2 = self.input_vertices2.text().split(',')
+            edges2 = [tuple(edge.split('-')) for edge in self.input_edges2.text().split(',')]
 
-        return links_list
+            # Создание графов на основе введенных данных
+            graph1 = Graph(vertices1, edges1)
+            graph2 = Graph(vertices2, edges2)
 
-    def check_isomorphism(self) -> None:
-        graph1_input = self.entry1.text()
-        graph2_input = self.entry2.text()
+            # Проверка изоморфизма графов
+            if graph1.is_isomorphic(graph2):
+                QMessageBox.information(self, 'Результат', 'Графы изоморфны.')
+            else:
+                QMessageBox.information(self, 'Результат', 'Графы не изоморфны.')
 
-        try:
-            graph1_links = self.parse_links(graph1_input)
-            graph2_links = self.parse_links(graph2_input)
-        except ValueError as e:
-            QMessageBox.critical(self, "Ошибка", str(e))
-            return
-
-        try:
-            graph1 = self.get_dict_links(graph1_links)
-            graph2 = self.get_dict_links(graph2_links)
         except Exception as e:
-            QMessageBox.critical(self, "Ошибка", str(e))
-            return
+            QMessageBox.critical(self, 'Ошибка', str(e))
 
-        is_isomorphic = self.is_isomorphic(graph1, graph2)
-        if is_isomorphic:
-            self.result_label.setText("Графы изоморфны")
-        else:
-            self.result_label.setText("Графы не изоморфны")
+    def clear_inputs(self) -> None:
+        """
+        Обработчик события нажатия кнопки "Очистить".
+        """
+        # Очистка полей ввода
+        self.input_vertices1.clear()
+        self.input_edges1.clear()
+        self.input_vertices2.clear()
+        self.input_edges2.clear()
+        print(self.size())
 
-    def clear_fields(self) -> None:
-        self.entry1.clear()
-        self.entry2.clear()
-        self.result_label.clear()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = GraphIsomorphismChecker()
+    window = GraphIsomorphismGUI()
     window.show()
     sys.exit(app.exec_())
