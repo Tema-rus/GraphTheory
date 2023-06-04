@@ -1,4 +1,5 @@
 import sys
+from typing import List, Tuple
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 
@@ -25,7 +26,7 @@ class GraphIsomorphismGUI(QWidget):
         """
 
         # Настройка размеров окна
-        self.setFixedHeight(308)
+        self.setFixedHeight(350)
 
         # Создание вертикального компоновщика
         layout = QVBoxLayout()
@@ -81,6 +82,9 @@ class GraphIsomorphismGUI(QWidget):
         self.setLayout(layout)
 
     def check_isomorphism(self):
+        """
+        Ввод данных
+        """
         try:
             # Получение введенных списков вершин и ребер
             vertices1 = self.input_vertices1.text().split(',')
@@ -92,11 +96,18 @@ class GraphIsomorphismGUI(QWidget):
             graph1 = Graph(vertices1, edges1)
             graph2 = Graph(vertices2, edges2)
 
+            # Проверка на корректность входных данных
+            self.validate_graph_input(vertices1, edges1)
+            self.validate_graph_input(vertices2, edges2)
+
             # Проверка изоморфизма графов
             if graph1.is_isomorphic(graph2):
                 QMessageBox.information(self, 'Результат', 'Графы изоморфны.')
             else:
                 QMessageBox.information(self, 'Результат', 'Графы не изоморфны.')
+
+        except ValueError as e:
+            QMessageBox.warning(self, 'Ошибка ввода данных', str(e))
 
         except Exception as e:
             QMessageBox.critical(self, 'Ошибка', str(e))
@@ -110,7 +121,35 @@ class GraphIsomorphismGUI(QWidget):
         self.input_edges1.clear()
         self.input_vertices2.clear()
         self.input_edges2.clear()
-        print(self.size())
+
+    @staticmethod
+    def validate_graph_input(vertices: List[str], edges: List[Tuple[str, ...]]) -> None:
+        """
+        Валидация ошибок ввода
+        :param vertices: Список ребер графа.
+        :type vertices: List[str, str]
+        :param edges: Список вершин графа.
+        :type edges: List[Tuple[str, str]]
+        :raise ValueError: Если обнаружены ошибки формата ввода данных.
+        """
+        # Проверка корректности формата введенных данных
+        if not all(vertex.strip() for vertex in vertices):
+            raise ValueError('Некорректный формат списка вершин')
+
+        for edge in edges:
+            if len(edge) != 2:
+                raise ValueError('Некорректный формат списка ребер')
+            if not all(vertex.strip() for vertex in edge):
+                raise ValueError('Некорректный формат списка ребер')
+
+        # Проверка наличия дубликатов вершин
+        if len(vertices) != len(set(vertices)):
+            raise ValueError('Обнаружены дубликаты вершин')
+
+        # Проверка наличия несуществующих вершин в ребрах
+        for edge in edges:
+            if edge[0] not in vertices or edge[1] not in vertices:
+                raise ValueError('Несуществующая вершина в списке ребер')
 
 
 if __name__ == '__main__':

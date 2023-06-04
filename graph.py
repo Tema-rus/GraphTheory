@@ -6,7 +6,7 @@ class Graph:
     Класс, представляющий неориентированный граф.
     """
 
-    def __init__(self, vertices: List[str] = None, edges: List[Tuple[str, str]] = None):
+    def __init__(self, vertices: List[str] = None, edges: List[Tuple[str, ...]] = None):
         """
         Инициализация класса.
 
