@@ -89,20 +89,18 @@ Graph(vertices: List[str] = None, edges: List[Tuple[str, str]] = None)
 #### Пример №1
 
 ```python
-graph1 = Graph(['A', 'B', 'C'], [('A', 'B'), ('B', 'C'), ('C', 'A')])
+graph1 = Graph(['A', 'B', 'C'], [('A', 'B'), ('C', 'A')])
 graph2 = Graph(['X', 'Y', 'Z'], [('X', 'Y'), ('Y', 'Z'), ('Z', 'X')])
 
 if graph1.is_isomorphic(graph2):
     print("Графы graph1 и graph2 изоморфны.")
 else:
     print("Графы graph1 и graph2 не изоморфны.")
-
 ```
 
 Вывод:
 
 ```
-
 Графы graph1 и graph2 не изоморфны.
 ```
 
@@ -116,15 +114,12 @@ if graph1.is_isomorphic(graph2):
     print("Графы graph1 и graph2 изоморфны.")
 else:
     print("Графы graph1 и graph2 не изоморфны.")
-
-
 ```
 
 Вывод:
 
 ```
 Графы graph1 и graph2 изоморфны.
-
 ```
 
 ## [main.py](main.py)
